@@ -1,17 +1,21 @@
-package org.firstinspires.ftc.teamcode.Test;
+package org.firstinspires.ftc.teamcode.Autonomous;
+
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.Enums.RingTargetPosn;
+import org.firstinspires.ftc.teamcode.Test.BasicAutonomous;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain_v3;
+@Autonomous(name="Red Right Line Auto #1", group="Auto")
 
-@Autonomous(name="Auto Opmode #1", group="Test")
+//////////////////////////////////////////////////////////
+// BasicAutonomous contains the main methods and are extend here
+// to keep the code more manageable.
+/////////////////////////////////////////////////////////
 
-public class Opmode_1 extends BasicAutonomous {
 
-    //Note: Subsystems are instantiated in the BasicAutonomous Class
+
+public class RED_Right_Line_Auto_1 extends BasicAutonomous {
+    /* Declare OpMode members. */
+    // All of this comes from the BasicAutonomous Class
 
     @Override
     public void runOpMode() {
@@ -45,14 +49,13 @@ public class Opmode_1 extends BasicAutonomous {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         // Put a hold after each turn
-        // This is currently set up or field coordinates NOT TELATIVE to the last move
-        gyroDrive(DRIVE_SPEED, 80.0, 0.0, 5);    // Drive FWD 110 inches
-        gyroTurn( TURN_SPEED, 90.0, 3);         // Turn  CCW to -45 Degrees
-        gyroHold( TURN_SPEED, -45.0, 0.5);    // Hold -45 Deg heading for a 1/2 second
+        // This is currently set up or field coordinates NOT RELATIVE to the last move
+        gyroDrive(DRIVE_SPEED, 60.0, 0.0, 5);    // Drive FWD 110 inches
+        //gyroTurn( TURN_SPEED, 90.0, 3);         // Turn  CCW to -45 Degrees
+        //gyroHold( TURN_SPEED, -45.0, 0.5);    // Hold -45 Deg heading for a 1/2 second
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
-
 
 
 }
