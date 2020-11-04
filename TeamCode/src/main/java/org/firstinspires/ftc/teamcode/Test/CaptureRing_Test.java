@@ -32,6 +32,8 @@ package org.firstinspires.ftc.teamcode.Test;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Elevator;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
 
@@ -49,14 +51,15 @@ import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Stacker Test", group="Linear Opmode")
+@TeleOp(name="Ring Capture Test", group="Linear Opmode")
 //@Disabled
-public class Stacker_Test extends LinearOpMode {
+public class CaptureRing_Test extends LinearOpMode {
 
     // Declare OpMode members.
     //private Stacker stacker = new Stacker();
-    private Wobblegoal wobble = new Wobblegoal();
-    private Shooter shooter = new Shooter();
+
+    private Intake  intake = new Intake();
+    private Elevator elevator = new Elevator();
 
 
 
@@ -64,7 +67,8 @@ public class Stacker_Test extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        shooter.init(hardwareMap);
+        elevator.init(hardwareMap);
+        intake.init(hardwareMap);
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
@@ -82,28 +86,28 @@ public class Stacker_Test extends LinearOpMode {
             // gripper assignment to X and Y buttons on implement gamepad
             // does not work 5/28. wires are in correct port too
             if (gamepad2.y) {
-                shooter.shootHighGoal();
-                telemetry.addData("Shooter High", "Complete ");
+                intake.Intakeon();
+                telemetry.addData("Intake on", "Complete ");
             }
             if (gamepad2.a) {
-                shooter.shooterOff();
-                telemetry.addData("Shooter High", "Complete ");
+                intake.Intakeoff();
+                telemetry.addData("Intake Off", "Complete ");
             }
 
             if (gamepad2.x) {
-                shooter.stackerMoveToReload();
+                elevator.ElevatorSpeedfast();
                 telemetry.addData("Stacker Reset", "Complete ");
             }
             if (gamepad2.b) {
-                shooter.stackerMoveToShoot();
+                elevator.Elevatoroff();
                 telemetry.addData("Stacker Ready to Shoot", "Complete ");
             }
             if (gamepad2.left_bumper) {
-                shooter.flipperForward();
+                intake.IntakeReverse();
                 telemetry.addData("Flipper Fwd", "Complete ");
             }
             if (gamepad2.right_bumper) {
-                shooter.flipperBackward();
+                elevator.Elevatorbackup();
                 telemetry.addData("Flipper Back", "Complete ");
             }
 
