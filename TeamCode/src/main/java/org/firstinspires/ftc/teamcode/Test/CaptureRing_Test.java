@@ -32,6 +32,9 @@ package org.firstinspires.ftc.teamcode.Test;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Elevator;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake;
+import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
 
 
@@ -48,12 +51,15 @@ import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Wobble Mover Test", group="Linear Opmode")
+@TeleOp(name="Ring Capture Test", group="Linear Opmode")
 //@Disabled
-public class WobbleMover_Test extends LinearOpMode {
+public class CaptureRing_Test extends LinearOpMode {
 
     // Declare OpMode members.
-    private Wobblegoal wobble = new Wobblegoal();
+    //private Stacker stacker = new Stacker();
+
+    private Intake  intake = new Intake();
+    private Elevator elevator = new Elevator();
 
 
 
@@ -61,7 +67,8 @@ public class WobbleMover_Test extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        wobble.init(hardwareMap);
+        elevator.init(hardwareMap);
+        intake.init(hardwareMap);
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
@@ -73,35 +80,35 @@ public class WobbleMover_Test extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             //========================================
-            // GAME PAD 2
+            // GAME PAD 2 Only for this test opMode
             //========================================
 
-            if (gamepad2.x) {
-                wobble.GripperOpen();
-               // wobble.resetWobble();
-                sleep(500); // pause for servos to move
-                telemetry.addData("Stowing Wobble Mover", "Complete ");
-            }
-
+            // gripper assignment to X and Y buttons on implement gamepad
+            // does not work 5/28. wires are in correct port too
             if (gamepad2.y) {
-                wobble.GripperClose();
-                //wobble.readyToGrabGoal();
-                sleep(500);
-                telemetry.addData("Gripper Close", "Complete ");
+                intake.Intakeon();
+                telemetry.addData("Intake on", "Complete ");
             }
             if (gamepad2.a) {
-                wobble.ArmExtend();
-                sleep(500);
-                telemetry.addData("Arm Extend", "Complete ");
+                intake.Intakeoff();
+                telemetry.addData("Intake Off", "Complete ");
+            }
+
+            if (gamepad2.x) {
+                elevator.ElevatorSpeedfast();
+                telemetry.addData("Stacker Reset", "Complete ");
             }
             if (gamepad2.b) {
-                wobble.ArmCarryWobble();
-                sleep(500);
-                telemetry.addData("Carry Wobble", "Complete ");
+                elevator.Elevatoroff();
+                telemetry.addData("Stacker Ready to Shoot", "Complete ");
             }
             if (gamepad2.left_bumper) {
-                wobble.ArmContract();
-                telemetry.addData("Reset Arm", "Complete ");
+                intake.IntakeReverse();
+                telemetry.addData("Flipper Fwd", "Complete ");
+            }
+            if (gamepad2.right_bumper) {
+                elevator.Elevatorbackup();
+                telemetry.addData("Flipper Back", "Complete ");
             }
 
         }

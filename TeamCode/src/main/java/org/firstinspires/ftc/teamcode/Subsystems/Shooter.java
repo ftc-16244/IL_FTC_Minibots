@@ -14,17 +14,22 @@ public class Shooter {
     public Servo stacker=null;
 
     //
-    //Constants
-    private static final double ShooterSpeedfastleft=.6;
-    private static final double ShooterSpeedfastright=.8;
-    private static final double shooterSpeedslowleft=.55;
-    private static final double shooterSpeedslowright=.75;
+    //Constants for shooter motors
+    private static final double ShooterSpeedfastleft=.4;
+    private static final double ShooterSpeedfastright=.55 ;
+    private static final double shooterSpeedslowleft=.4;
+    private static final double shooterSpeedslowright=.45;
     private static final double jamClear=-.35;
+    //Constants for stacker servos
     private static final double leftUp = 0.75; // .75 a little shy but ok due to hitting bolt
     private static final double leftBack = .4; //good at 0.4;
     private static final double rightUp = (1-leftUp);
     private static final double rightBack = (1-leftBack);
     private static final double flippercenter = 0.5;
+    private static final double stackerReload = 0.43; // 0.42 causes rings to slide forward too much
+    private static final double stackerShoot = 0.55; // 0.55
+    private static final double stacketMidLoad = .46; // tips stacker back so it loads better
+
 
 
 
@@ -39,6 +44,9 @@ public class Shooter {
         shooterright.setDirection(DcMotor.Direction.FORWARD);
         shooterleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         shooterright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // make sure flippers are back and stacker it ready to load
+        shooterReload();
     }
     public void shootMiddleGoal() {
         shooterleft.setPower(shooterSpeedslowleft);
@@ -52,14 +60,20 @@ public class Shooter {
             shooterleft.setPower(0);
             shooterright.setPower(0);
         }
-    public void stackermovetoShoot() {
-        leftFlipper.setPosition(leftUp);
-        rightFlipper.setPosition(rightUp);
+    public void stackerMoveToShoot() {
+        stacker.setPosition(stackerShoot);
+
     }
-    public void stackermovetoReload() {
-        leftFlipper.setPosition(leftBack);
-        rightFlipper.setPosition(rightBack);
+
+    public void stackerMoveToReload() {
+        stacker.setPosition(stackerReload);
     }
+
+    public void stackerMoveToMidLoad() {
+        stacker.setPosition(stacketMidLoad);
+
+    }
+
     public void flipperCalibrateinCenter() {
         leftFlipper.setPosition(flippercenter);
         rightFlipper.setPosition(flippercenter);
@@ -67,21 +81,21 @@ public class Shooter {
     public void flipperForward() {
         leftFlipper.setPosition(leftUp);
         rightFlipper.setPosition(rightUp);
+
     }
     public void flipperBackward() {
         leftFlipper.setPosition(leftBack);
         rightFlipper.setPosition(rightBack);
     }
-    public void shootoneRing() {
+    public void shootoneRingHigh() {
         shootHighGoal();
-        stackermovetoShoot();
-        flipperForward();
+        stackerMoveToShoot();
         flipperBackward();
     }
     public void shooterReload() {
-        stackermovetoReload();
-        flipperBackward();
-        shooterOff();
+        stackerMoveToMidLoad(); //
+        flipperBackward(); // move flippers back
+        shooterOff(); // turn off shooters
 
         }
 
