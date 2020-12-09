@@ -1,25 +1,21 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Enums.DriveSpeedState;
 import org.firstinspires.ftc.teamcode.Enums.RingCollectionState;
+import org.firstinspires.ftc.teamcode.Subsystems.Debouce;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain_v3;
 import org.firstinspires.ftc.teamcode.Subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
-import org.firstinspires.ftc.teamcode.Enums.DriveSpeedState;
 
-import static java.lang.Thread.sleep;
-
-@TeleOp(name="Meet 1 Teleop", group="Teleop")
-@Disabled
-public class Meet_1_Teleop extends OpMode {
+@TeleOp(name="Meet 1A Teleop", group="Teleop")
+//@Disabled
+public class Meet_1_A_Teleop extends OpMode {
 
 
     /* Declare OpMode members. */
@@ -31,6 +27,8 @@ public class Meet_1_Teleop extends OpMode {
     public Wobblegoal           wobble  = new Wobblegoal();
     public Elevator elevator    = new Elevator();
     public ElapsedTime gripperCloseTimer = new ElapsedTime();
+    //public ElapsedTime debounceTimer = new ElapsedTime();
+    private Debouce mdebounce = new Debouce();
 
     private DriveSpeedState  currDriveState;
     private RingCollectionState ringCollectorState;
@@ -60,6 +58,7 @@ public class Meet_1_Teleop extends OpMode {
 
         telemetry.addData("FAST DRIVE","Mode");//
         //telemetry.update();
+
     }
 
     /*
@@ -132,18 +131,41 @@ public class Meet_1_Teleop extends OpMode {
        // Gamepad 1 Buttons
 
 
-        if (gamepad1.left_bumper) {
+        if (gamepad1.left_bumper && ringCollectorState == RingCollectionState.OFF) {
             shooter.flipperBackward();
             shooter.stackerMoveToMidLoad();
             ringCollectorState = RingCollectionState.COLLECT;
+            telemetry.addData("Collector State", ringCollectorState);
+            mdebounce.debounce(175); // need to pause for a few ms to let drive release the button
 
         }
-        if (gamepad1.right_bumper) {
+        if (gamepad1.left_bumper && ringCollectorState == RingCollectionState.COLLECT) {
+            shooter.flipperBackward();
+            shooter.stackerMoveToMidLoad();
+            ringCollectorState = RingCollectionState.OFF;
+            telemetry.addData("Collector State", ringCollectorState);
+            mdebounce.debounce(175);
+        }
+
+
+        if (gamepad1.right_bumper && ringCollectorState == RingCollectionState.OFF) {
+            shooter.flipperBackward();
+            shooter.stackerMoveToReload();
+            ringCollectorState = RingCollectionState.EJECT;
+            telemetry.addData("Collector State", ringCollectorState);
+            mdebounce.debounce(175);
+
+        }
+
+        if (gamepad1.right_bumper && ringCollectorState == RingCollectionState.EJECT) {
             shooter.flipperBackward();
             shooter.stackerMoveToReload();
             ringCollectorState = RingCollectionState.OFF;
+            telemetry.addData("Collector State", ringCollectorState);
+            mdebounce.debounce(175);
 
         }
+
         if (gamepad1.x) {
             //shooter.shooterReload();
             shooter.stackerMoveToReload();
@@ -170,11 +192,16 @@ public class Meet_1_Teleop extends OpMode {
         }
         if (gamepad1.left_trigger > 0.25) {
             shooter.flipperForward();
+            debounce(700);
             telemetry.addData("Flipper Fwd", "Complete ");
+            shooter.flipperBackward();
+            debounce(700);
         }
         if (gamepad1.right_trigger > 0.25) {
-            shooter.flipperBackward();
-            telemetry.addData("Flipper Back", "Complete ");
+            //shooter.flipperBackward();
+            //telemetry.addData("Flipper Back", "Complete ");
+            shooter.shootonePowerShots();
+            telemetry.addData("SHooter Low for Power Shots", "Complete ");
         }
 
         // Gamepad 1 Bumpers - for Speed Control
@@ -328,5 +355,14 @@ public class Meet_1_Teleop extends OpMode {
     //===================================================================
     // Helper Methods
     //==================================================================
+
+    void debounce(long debounceTime){
+        try {
+            Thread.sleep(debounceTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

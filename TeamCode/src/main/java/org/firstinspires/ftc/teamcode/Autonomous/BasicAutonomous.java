@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.Enums.DriveSpeedState;
+import org.firstinspires.ftc.teamcode.Enums.RingCollectionState;
 import org.firstinspires.ftc.teamcode.Enums.ShooterState;
 import org.firstinspires.ftc.teamcode.Enums.WobbleTargetZone;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain_v3;
@@ -27,7 +29,12 @@ import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
 
 import java.util.List;
 
-@Autonomous(name="Basic Autonomous for Test", group="Test")
+@Autonomous(name="Base Autonomous OpMode", group="Auto")
+@Disabled
+
+// This opMode will work if used from the left blue starting line. It's main intent is to be
+//the basis for all other Auto Opmodes. Extend this class to create OpModes with different starting
+// positions or different paths or objectives.
 
 // Place robot on the left most blue line when facing the goal. Robot should be placed such that
 // as it drives straight ahead it will not hit the stack of rings. So basically center the robot on
@@ -46,13 +53,19 @@ public class BasicAutonomous extends LinearOpMode {
     public ElapsedTime          PIDtimer    = new ElapsedTime(); // PID loop timer
     public ElapsedTime          drivetime   = new ElapsedTime(); // timeout timer for driving
     public ElapsedTime          tfTime      = new ElapsedTime(); // timer for tensor flow
-    public ElapsedTime          autoShootTimer  = new ElapsedTime(); //auto shooter timer (4 rings)
-    public static double        autoShootTimeAllowed = 6; //  seconds allows 4 shoot cycles in case one messes up
-    public static double        tfSenseTime          = 4; // needs a couple seconds to process the image and ID the target
+    public ElapsedTime          ShootTimer          = new ElapsedTime(); //auto shooter timer (4 rings)
+    public ElapsedTime          autoRingCollectTimer    = new ElapsedTime(); //auto shooter timer (4 rings)
+    //public static double        shooterStartUpTimeAllowed = 1.25;
+    public static double        autoShootTimeAllowed    = 5; //  seconds allows 4 shoot cycles in case one messes up
+    //public static double      extraRingShootTimeAllowed    = 4; //  seconds allows 4 shoot cycles in case one messes up
+    public static double        tfSenseTime             = 1; // needs a couple seconds to process the image and ID the target
+
+
+    public static double        autoRingCollectTimeAllowed = 1.5; // time allowed to let the single ring to get picked up
 
     // These constants define the desired driving/control characteristics
     // The can/should be tweaked to suit the specific robot drive train.
-    public static final double     DRIVE_SPEED             = 0.6;     // Nominal speed for better accuracy.
+    public static final double     DRIVE_SPEED             = 0.65;     // Nominal speed for better accuracy.
     public static final double     TURN_SPEED              = 0.50;    // 0.4 for berber carpet. Check on mat too
 
     public static final double     HEADING_THRESHOLD       = 1.5;      // As tight as we can make it with an integer gyro
@@ -70,7 +83,7 @@ public class BasicAutonomous extends LinearOpMode {
     public  double                 totalError;
 
     // STATE Definitions from the ENUM package
-
+    RingCollectionState mRingCollectionState = RingCollectionState.OFF;
     ShooterState mShooterState = ShooterState.STATE_SHOOTER_OFF; // default condition, this is needed to keep shooter on for a Linear Opmode
     WobbleTargetZone Square = WobbleTargetZone.BLUE_A; // Default target zone
 
@@ -120,6 +133,10 @@ public class BasicAutonomous extends LinearOpMode {
         drivetrain.init(hardwareMap);
         wobble.init(hardwareMap);
         shooter.init(hardwareMap);
+        intake.init(hardwareMap);
+        elevator.init(hardwareMap);
+
+
         // intake.init(hardwareMap); not necessary in Auto at this time
         // elevator .....also not necessary
 
@@ -223,7 +240,7 @@ public class BasicAutonomous extends LinearOpMode {
         gyroDrive(DRIVE_SPEED, 55.0, 0.0, 10);
         gyroTurn(TURN_SPEED,-10,3);
         mShooterState = ShooterState.STATE_SHOOTER_ACTIVE;
-        shoot3Rings(mShooterState);   // call method to start shooter and launch 3 rings
+        shoot3Rings(mShooterState, autoShootTimeAllowed);   // call method to start shooter and launch 3 rings
         drivetime.reset(); // reset because time starts w hen TF starts and time is up before we can call gyroDrive
 
         // Switch manages the 3 different Target Zone objectives based on the number of rings stacked up
@@ -550,11 +567,21 @@ public class BasicAutonomous extends LinearOpMode {
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 
-    public void shoot3Rings(ShooterState mShooterState){
-        autoShootTimer.reset();
-        while (opModeIsActive() && autoShootTimer.time()  <= autoShootTimeAllowed)  {
+    public void shooterStartUp(ShooterState mShooterState, double shooterStartUpTimeAllowed) {
+        ShootTimer.reset();
+        while (opModeIsActive() && ShootTimer.time()  <= shooterStartUpTimeAllowed)  {
+                shooter.shootHighGoal();  // spins up the shooter before first shot
+
+        }
+
+    }
+
+    public void shoot3Rings(ShooterState mShooterState, double ShootTimeAllowed){
+
+        ShootTimer.reset();
+        while (opModeIsActive() && ShootTimer.time()  <= ShootTimeAllowed)  {
             if (mShooterState == ShooterState.STATE_SHOOTER_ACTIVE) {
-                shooter.shootoneRingHigh();
+                shooter.shootOneRingHigh(); // this is only used in auto due to different stacker position
                 sleep(750);
                 shooter.flipperForward();
                 sleep(750);
@@ -564,9 +591,30 @@ public class BasicAutonomous extends LinearOpMode {
             else {
                 shooter.shooterOff();
             }
+            telemetry.addData("Shoot Timer Elappsed", ShootTimer.time());
         }
-        mShooterState = ShooterState.STATE_SHOOTER_OFF;
+        //mShooterState = ShooterState.STATE_SHOOTER_OFF;
         shooter.shooterReload();
+    }
+    
+
+    public void collectRingsInAuto_A(RingCollectionState mRingCollectionState, double autoRingCollectTimeAllowed ){
+        autoRingCollectTimer.reset();
+        while (opModeIsActive() && autoRingCollectTimer.time()  <= autoRingCollectTimeAllowed)  {
+            if (mRingCollectionState == RingCollectionState.COLLECT) {
+                intake.Intakeon(); // this is only used in auto due to different stacker position
+                elevator.ElevatorSpeedfast();
+                drivetrain.leftFront.setPower(DRIVE_SPEED); // simple drive forward encododers shound handle speed but not distance here.
+                drivetrain.rightFront.setPower(DRIVE_SPEED);
+
+
+
+            }
+            else {
+                intake.Intakeoff();
+            }
+        }
+
     }
 
 }
