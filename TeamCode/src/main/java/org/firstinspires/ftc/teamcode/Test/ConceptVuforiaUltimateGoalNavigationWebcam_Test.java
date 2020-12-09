@@ -135,7 +135,7 @@ public class ConceptVuforiaUltimateGoalNavigationWebcam_Test extends LinearOpMod
         /*
          * Retrieve the camera we are to use.
          */
-        webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        webcamName = hardwareMap.get(WebcamName.class, "Webcam 2");
 
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
