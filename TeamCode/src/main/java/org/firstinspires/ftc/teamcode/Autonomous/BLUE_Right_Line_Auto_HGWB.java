@@ -79,7 +79,7 @@ public class BLUE_Right_Line_Auto_HGWB extends BasicAutonomous {
         telemetry.update();
 
         // make sure the gyro is calibrated before continuing
-        while (!isStopRequested() && drivetrain.imu.isGyroCalibrated() && opModeIsActive())  {
+        while (!isStopRequested() && !drivetrain.imu.isGyroCalibrated() && opModeIsActive())  {
             sleep(50);
             idle();
         }
