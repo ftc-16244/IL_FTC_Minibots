@@ -5,6 +5,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Enums.ShooterState;
+
+import static java.lang.Thread.sleep;
+
 public class Shooter {
     // Define hardware objects
     public DcMotor  shooterleft=null;
@@ -19,7 +23,7 @@ public class Shooter {
     private static final double ShooterSpeedfastright=.51; // 0.53
     //We are changing the speeds to see which speeds make the first ring in
     private static final double shooterSpeedslowleft=.4;
-    private static final double shooterSpeedslowright=.50;
+    private static final double shooterSpeedslowright=.45;
     private static final double jamClear=-.35;
     //Constants for stacker servos
     private static final double leftUp = 0.75; // .75 a little shy but ok due to hitting bolt
@@ -127,6 +131,23 @@ public class Shooter {
         shooterright.setPower(jamClear);
 
 
+    }
+
+    public void shoot_N_rings(int rings) throws InterruptedException {
+        int ShotCount = 0;
+        while (ShotCount<rings)  {
+
+                shootOneRingHigh(); // this is only used in auto due to different stacker position
+                sleep(750);
+                flipperForward();
+                sleep(750);
+                flipperBackward();
+                ShotCount++;
+
+
+
+        }
+        shooterOff(); // turn off when we exit the loop
     }
 }
 
