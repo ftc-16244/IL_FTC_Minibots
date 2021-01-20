@@ -196,8 +196,8 @@ public class EXP_Meet_2_Auto extends BasicAutonomous {
 
                 gyroDrive(DRIVE_SPEED*.7,36,180,4);
 
-                gyroTurn(TURN_SPEED*.4,160,3);
-                gyroDrive(DRIVE_SPEED*5,6.5,160,2);
+                gyroTurn(TURN_SPEED*.4,157,3); 
+                gyroDrive(DRIVE_SPEED*5,6.5,157,3);
 
                 //wobble.ArmExtend();
 
@@ -245,9 +245,9 @@ public class EXP_Meet_2_Auto extends BasicAutonomous {
                 elevator.ElevatorSpeedfast();
                 // Go for second wobbble
                 gyroTurn(TURN_SPEED,155,3);
-                gyroTurn(TURN_SPEED*.45,148,2);
+                gyroTurn(TURN_SPEED*.45,150,2);
                 wobble.lowerWobbleClamp();
-                gyroDrive(DRIVE_SPEED,17,148,3);
+                gyroDrive(DRIVE_SPEED,17,150,3);
                 gyroDrive(DRIVE_SPEED*.45,7,148,3);
                 wobble.GripperClose();
                 sleep(500);
@@ -274,7 +274,7 @@ public class EXP_Meet_2_Auto extends BasicAutonomous {
                }
 
                 drivetime.reset();
-                gyroDrive(DRIVE_SPEED,18,-2,3);
+                gyroDrive(DRIVE_SPEED,21,-6,3);
 
 
                 wobble.GripperOpen();
