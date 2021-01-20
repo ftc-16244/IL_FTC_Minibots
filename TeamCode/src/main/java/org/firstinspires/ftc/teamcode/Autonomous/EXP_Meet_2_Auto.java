@@ -196,8 +196,10 @@ public class EXP_Meet_2_Auto extends BasicAutonomous {
 
                 gyroDrive(DRIVE_SPEED*.7,36,180,4);
 
+
                 gyroTurn(TURN_SPEED*.4,157,3); 
                 gyroDrive(DRIVE_SPEED*5,6.5,157,3);
+
 
                 //wobble.ArmExtend();
 
