@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Enums.DriveSpeedState;
+import org.firstinspires.ftc.teamcode.Enums.LiftMode;
 import org.firstinspires.ftc.teamcode.Enums.RingCollectionState;
 import org.firstinspires.ftc.teamcode.Enums.WobbleLiftPosn;
 import org.firstinspires.ftc.teamcode.Enums.WristPosn;
@@ -18,8 +19,10 @@ import org.firstinspires.ftc.teamcode.Subsystems.Ring_Spreader;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter_VelCtrl;
 import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
 
+import java.util.Base64;
+
 @TeleOp(name="Meet 4 Teleop with Manual Lift", group="Teleop")
-@Disabled
+//@Disabled
 public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
 
 
@@ -38,7 +41,7 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
     private Debouce mdebounce = new Debouce();
 
     // ENUMS
-
+    private LiftMode liftMode=LiftMode.ENCODER;
     private DriveSpeedState  currDriveState;
     private RingCollectionState ringCollectorState;
     private double gripperCloseTime = 1.0;
@@ -105,7 +108,7 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
         double turn;
         double max;
         double speedfactor = 0.5;
-
+        double manualSpeed = 0;
 
         // Ultimate Goal
         //Gamepad 1
@@ -131,20 +134,19 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
         // left joystick is assigned to drive speed
         drive = -gamepad1.left_stick_y;
         // right joystick is for turning
-        turn  =  gamepad1.right_stick_x;
+        turn = gamepad1.right_stick_x;
         // Combine drive and turn for blended motion.
-        left  = drive + turn;
+        left = drive + turn;
         right = drive - turn;
 
         // Normalize the values so neither exceed +/- 1.0
         max = Math.max(Math.abs(left), Math.abs(right));
-        if (max > 1.0)
-        {
+        if (max > 1.0) {
             left /= max; // does this to stay within the limit and keeps the ratio the same
             right /= max;
         }
 
-       // Gamepad 1 Buttons
+        // Gamepad 1 Buttons
 
 
         if (gamepad1.left_bumper && ringCollectorState == RingCollectionState.OFF) {
@@ -217,19 +219,17 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
             //shooter.flipperBackward();
             //telemetry.addData("Flipper Back", "Complete ");
             shooter.shootonePowerShots();
-            currDriveState =  DriveSpeedState.DRIVE_SLOW;
+            currDriveState = DriveSpeedState.DRIVE_SLOW;
             telemetry.addData("SHooter Low for Power Shots", "Complete ");
         }
 
         // Gamepad 1 Bumpers - for Speed Control
         // set-up drive speed states on bumpers
-        if (gamepad1.left_stick_button)
-        {
+        if (gamepad1.left_stick_button) {
             currDriveState = DriveSpeedState.DRIVE_FAST;
         }
-        if (gamepad1.right_stick_button)
-        {
-            currDriveState =  DriveSpeedState.DRIVE_SLOW;
+        if (gamepad1.right_stick_button) {
+            currDriveState = DriveSpeedState.DRIVE_SLOW;
         }
 
 
@@ -245,19 +245,19 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
             telemetry.addData("Ready to rab Wobble", "Complete ");
         }
 
-        if (gamepad1.dpad_up){
+        if (gamepad1.dpad_up) {
             gripperCloseTimer.reset();
             wobble.GripperClose();
             //while (gripperCloseTimer.time() < gripperCloseTime){
 
-                // stall program so gripper can close
-                // not necessary in Linear Opmode just in iterative
-                //more than a couple seconds and this will trow error
+            // stall program so gripper can close
+            // not necessary in Linear Opmode just in iterative
+            //more than a couple seconds and this will trow error
             //}
 
             wobble.raiseWobbleClamp();
             //wobble.readyToGrabGoal();
-           telemetry.addData("Carrying Wobble", "Complete ");
+            telemetry.addData("Carrying Wobble", "Complete ");
         }
         if (gamepad1.dpad_right) {
             wobble.GripperOpen();
@@ -276,13 +276,13 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
 
         }
         // Hold dpad down then move right hand (turn stick) back (in the Y direction) to park wrist
-        if (gamepad1.dpad_down && gamepad1.right_stick_y > 0.5){
+        if (gamepad1.dpad_down && gamepad1.right_stick_y > 0.5) {
 
             wristPosn = WristPosn.PARK; //
         }
 
 
-        if (gamepad1.back){
+        if (gamepad1.back) {
 
             //wobble.LiftRise();
             liftposn = WobbleLiftPosn.UP;
@@ -303,10 +303,25 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
             m_Ring_Spreader.ringSpreaderDown();
         }
 
-        if (gamepad2.back){
+        if (gamepad2.back) {
             shooter.stackerMoveToDump();
             intake.Intakeoff();
             elevator.Elevatoroff();
+        }
+        manualSpeed = -gamepad2.left_stick_y;
+        if (gamepad2.left_bumper) {
+            liftMode = LiftMode.MANUAL;
+            wobble.WobbleLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+        if (gamepad2.right_bumper) {
+            liftMode = LiftMode.ENCODER;
+            wobble.WobbleLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            wobble.WobbleLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        if (gamepad2.dpad_left && liftMode == liftMode.MANUAL) {
+            wobble.GripperOpen();
+            wristPosn = wristPosn.DOWN;
+
         }
        // switch case to determine what mode the arm needs to operate in.
 
@@ -341,31 +356,38 @@ public class Meet_4_Teleop_w_Manual_Lift_Option extends OpMode {
         }
 
         // State machine for the wobble lift
-        switch(liftposn) {
+        if (liftMode==LiftMode.ENCODER){
+            telemetry.addData("liftMode", liftMode);
+            switch (liftposn) {
 
-            case DOWN:
-                telemetry.addData("Lift Position",liftposn);
-                wobble.LiftLower();
-                if(wobble.getLiftHeight() < 0.15){
-                    liftposn =WobbleLiftPosn.IDLE;
-                    wobble.WobbleLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                }
-                break;
+                case DOWN:
+                    telemetry.addData("Lift Position", liftposn);
+                    wobble.LiftLower();
+                    if (wobble.getLiftHeight() < 0.15) {
+                        liftposn = WobbleLiftPosn.IDLE;
+                        wobble.WobbleLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    }
+                    break;
 
-            case UP:
-                telemetry.addData("Lift Position",liftposn);
-                wobble.LiftRise();
-                //wobble.wobbleWristDown();
-
-
-                break;
-
-            case IDLE:
-                telemetry.addData("Lift Position",liftposn);
-                wobble.LiftIdle();
+                case UP:
+                    telemetry.addData("Lift Position", liftposn);
+                    wobble.LiftRise();
+                    //wobble.wobbleWristDown();
 
 
-                break;
+                    break;
+
+                case IDLE:
+                    telemetry.addData("Lift Position", liftposn);
+                    wobble.LiftIdle();
+
+
+                    break;
+            }
+        }
+        if (liftMode== liftMode.MANUAL){
+            telemetry.addData("Lift Position", liftposn);
+            wobble.WobbleLift.setPower(manualSpeed);
         }
 
         // Wrist Position
