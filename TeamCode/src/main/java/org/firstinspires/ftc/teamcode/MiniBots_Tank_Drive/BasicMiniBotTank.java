@@ -146,13 +146,41 @@ public class BasicMiniBotTank extends LinearOpMode {
                 gyroTurn(TURN_SPEED, gyroAngle, 3);
             }
              */
+            // DCA Notes. This gives a nice wide definition of "BLUE" between HUE of
+            // 165 and 255. if you need to look at Saturation you would add another &&
+            // where hsvValues[1] > S_Value_of_Blue_Tape Probably 0.7 or more. Need to experiment.
+
+
            if (hsvValues[0] >165 && hsvValues[0] < 255) {
-                gyroAngle -= 90;
+                gyroAngle -= 90; // -90 is a right turn per IMU sign convention
                 //blue 165 blueish green, 255 purple violet
                telemetry.addData("GyroAngle", "%7d", gyroAngle);
                telemetry.update();
                gyroTurn(BasicMiniBotTank.TURN_SPEED, gyroAngle, 3);
             }
+
+           // It looks like you are calling gyroDrive over and over again each time the
+           // while loop at line 131 goes around. I'm not sure we are getting a clean exit out
+           // of the "drive" part. This is not the case with gyroTurn. You call gyroTurn one time and the while loop
+           // inside gyroTrun decides when to stop turning and return to the main code. That "internal"
+           //while loop is near line 353.
+           // I would compartmentalize encoderDrive in a while loop like gyroTurn.
+           // You will need to put the while loop back in and add a new condition.
+           // Here is what could be put in that new while loop to stop the "driving forward"
+           // 1. Opmode is no longer active
+           // 2. Number of inches specified is met (make distance more than tape spacing)
+           // 3. Timeout has come and gone.
+           // 4. Sensor detects a color ---so we need to stop driving forward and get ready to turn
+           // As long as the robot stops and does not slide past the tape....the sensor will then basically
+           // call the gyroTurn method and pass the correct angle.
+           // in the end our while loop at line 131 is going to send execution to a encoderDrive.
+           // when encoderDrive is done looping we go back to the main while loop and it will send us
+           // to a gyroTurn, that finishes and the while loop sends us to our next method.
+           // Basically we flip back and forth between drive and trun methods. We have to "finish" our
+           // moves in the either method, go back to the main code and get out new assignment.
+           // THis is sort of sounding line a state machine...I have a drive forward state and a turn state
+           // I can't do both at one time. I don't think a sate machine is necessary it is just to make a point
+           // that we have two possible operations that can't happen at once.
             else {
                 gyroDrive(DRIVE_SPEED*0.5, gyroAngle);
 
