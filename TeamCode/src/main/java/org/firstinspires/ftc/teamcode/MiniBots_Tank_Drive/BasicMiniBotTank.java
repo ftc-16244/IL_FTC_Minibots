@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.MiniBots_Tank_Drive;
 
+import android.graphics.Color;
 import android.view.View;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -8,6 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -32,7 +35,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Wobblegoal;
 
 import java.util.List;
 
-@Autonomous(name="Basic MiniBot OpMode", group="Au@to")
+@Autonomous(name="Basic MiniBot OpModeNR", group="Au@to")
 //@Disabled
 
 // This opMode will work if used from the left blue starting line. It's main intent is to be
@@ -75,7 +78,7 @@ public class BasicMiniBotTank extends LinearOpMode {
     public double                  lasterror;
     public  double                 totalError;
 
-
+    final float[] hsvValues = new float[3];
 
 
     @Override
@@ -116,22 +119,46 @@ public class BasicMiniBotTank extends LinearOpMode {
 
         telemetry.update();
 
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+
+        if (colorSensor instanceof SwitchableLight) {
+            ((SwitchableLight)colorSensor).enableLight(true);
+        }
         /////////////////////////////////////////////////////////////////////////////////////////////
         waitForStart();
         ////////////////////////////////////////////////////////////////////////////////////////////
+        int gyroAngle = 0;
+        while (!isStopRequested()) {
 
+            // Get the normalized colors from the sensor
+            NormalizedRGBA colors = colorSensor.getNormalizedColors();
 
+            // Update the hsvValues array by passing it to Color.colorToHSV()
+            Color.colorToHSV(colors.toColor(), hsvValues);
 
-        drivetime.reset(); // reset because time starts when TF starts and time is up before we can call gyroDrive
-        // Drive paths are initially all the same to get to the shooter location
-        gyroDrive(DRIVE_SPEED, 55.0, 0.0, 10);
-        gyroTurn(TURN_SPEED,90,3);
-        gyroDrive(DRIVE_SPEED,25,90,3);
-        gyroTurn(TURN_SPEED,180,3);
-        gyroDrive(DRIVE_SPEED,25,180,3);
-        gyroTurn(TURN_SPEED,-90,3);
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
+            // Hue is al we rally need It is a number between 0 and 360 degress to indicate color.
+            // Red is around 0 and blue is about 200 give or take.
+
+            /**
+            if (hsvValues[0] > 70 && hsvValues[0] < 145) {
+                gyroAngle += 90;
+                //red 315 reddish purple 45- golden yellow
+                gyroTurn(TURN_SPEED, gyroAngle, 3);
+            }
+             */
+           if (hsvValues[0] >165 && hsvValues[0] < 255) {
+                gyroAngle -= 90;
+                //blue 165 blueish green, 255 purple violet
+               telemetry.addData("GyroAngle", "%7d", gyroAngle);
+               telemetry.update();
+               gyroTurn(BasicMiniBotTank.TURN_SPEED, gyroAngle, 3);
+            }
+            else {
+                gyroDrive(DRIVE_SPEED*0.5, gyroAngle);
+
+            }
+        }
+
     }
 
 
@@ -143,101 +170,49 @@ public class BasicMiniBotTank extends LinearOpMode {
      *  3) Timeout time is reached - prevents robot from getting stuck
      *
      * @param speed      Target speed for forward motion.  Should allow for _/- variance for adjusting heading
-     * @param distance   Distance (in inches) to move from current position.  Negative distance means move backwards.
      * @param angle      Absolute Angle (in Degrees) relative to last gyro reset.
      *                   0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
      *                   If a relative angle is required, add/subtract from current heading.
      */
-    public void gyroDrive ( double speed,
-                            double distance,
-                            double angle, double timeout) {
+    public void gyroDrive ( double speed, double angle) {
 
-        int     newLeftTarget;
-        int     newRightTarget;
-        int     moveCounts;
         double  max;
         double  error;
         double  steer;
         double  leftSpeed;
         double  rightSpeed;
+
         totalError = 0;
         lasterror = 0;
-        telemetry.addData("gyroDrive Activated", "Complete");
-        // Ensure that the opmode is still active
-        // Use timeout in case robot gets stuck in mid path.
-        // Also a way to keep integral term from winding up to bad.
-        if (opModeIsActive() & drivetime.time() < timeout) {
 
-            // Determine new target position in ticks/ counts then pass to motor controller
-            moveCounts = (int)(distance *  MiniBot_DriveDrain_Tank.COUNTS_PER_INCH);
-            newLeftTarget = drivetrain.leftFront.getCurrentPosition() + moveCounts;
-            newRightTarget = drivetrain.rightFront.getCurrentPosition() + moveCounts;
+        // Determine new target position in ticks/ counts then pass to motor controller
+        drivetrain.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drivetrain.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            // Set Target using the calculated umber of ticks/counts
+        // start motion.
+        // Up to now this is all the same as a drive by encoder opmode.
+        speed = Range.clip(Math.abs(speed), 0.0, 1.0);
+        drivetrain.leftFront.setPower(speed);
+        drivetrain.rightFront.setPower(speed);
 
-            drivetrain.leftFront.setTargetPosition(newLeftTarget);
-            drivetrain.rightFront.setTargetPosition(newRightTarget);
-            // Tell motor control to use encoders to go to target tick count.
+        // adjust relative speed based on heading error.
+        // Positive angle means drifting to the left so need to steer to the
+        // right to get back on track.
+        error = getError(angle);
+        steer = getSteer(error, Kp_DRIVE, Ki_DRIVE, Kd_DRIVE);
 
-            drivetrain.leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            drivetrain.rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftSpeed = speed + steer;
+        rightSpeed = speed - steer;
 
-            // start motion.
-            // Up to now this is all the same as a drive by encoder opmode.
-            speed = Range.clip(Math.abs(speed), 0.0, 1.0);
-            drivetrain.leftFront.setPower(speed);
-            drivetrain.rightFront.setPower(speed);
-
-            // keep looping while we are still active, and BOTH motors are running.
-            // once one motor gets to the target number of ticks it is no longer "busy"
-            // and isbusy in false causing the loop to end.
-            while (opModeIsActive() &&
-                    (drivetrain.leftFront.isBusy() && drivetrain.rightFront.isBusy())) {
-
-                // adjust relative speed based on heading error.
-                // Positive angle means drifting to the left so need to steer to the
-                // right to get back on track.
-                error = getError(angle);
-                steer = getSteer(error, Kp_DRIVE, Ki_DRIVE, Kd_DRIVE);
-
-                // if driving in reverse, the motor correction also needs to be reversed
-                if (distance < 0)
-                    steer *= -1.0;
-
-                leftSpeed = speed + steer;
-                rightSpeed = speed - steer;
-
-                // Normalize speeds if either one exceeds +/- 1.0;
-                max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-                if (max > 1.0)
-                {
-                    leftSpeed /= max;
-                    rightSpeed /= max;
-                }
-
-                drivetrain.leftFront.setPower(leftSpeed);
-                drivetrain.rightFront.setPower(rightSpeed);
-
-                // Display drive status for the driver.
-                telemetry.addData("Err/St",  "%5.1f/%5.1f",  error, steer);
-                telemetry.addData("Target",  "%7d:%7d",      newLeftTarget,  newRightTarget);
-                telemetry.addData("Actual",  "%7d:%7d",      drivetrain.leftFront.getCurrentPosition(),
-                        drivetrain.rightFront.getCurrentPosition());
-                telemetry.addData("Speed",   "%5.2f:%5.2f",  leftSpeed, rightSpeed);
-                telemetry.update();
-
-
-            }
-
-            // Stop all motion;
-            drivetrain.leftFront.setPower(0);
-            drivetrain.rightFront.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            drivetrain.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            drivetrain.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // Normalize speeds if either one exceeds +/- 1.0;
+        max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+        if (max > 1.0)
+        {
+            leftSpeed /= max;
+            rightSpeed /= max;
         }
-        drivetime.reset(); // reset the timer for the next function call
+        drivetrain.leftFront.setPower(leftSpeed);
+        drivetrain.rightFront.setPower(rightSpeed);
     }
 
     public void gyroDriveandCollectRings ( double speed,
