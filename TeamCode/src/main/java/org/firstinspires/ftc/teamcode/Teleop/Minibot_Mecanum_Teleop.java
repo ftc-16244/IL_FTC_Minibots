@@ -13,14 +13,14 @@ import org.firstinspires.ftc.teamcode.Test.Led_Lights;
 @TeleOp(name="Mecanum MiniBot Teleop", group="Teleop")
 
 public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
-
+    //Led_Lights led_lights = new Led_Lights();
     @Override
     public void runOpMode() {
         // All of the drivetrain details are in the subsystems package. This keep the clutter down.
         // Plus all drivetrain details can e reused for all opmodes and never recreated.
         //Four_Motor_Minibot_Meccanum_Drivetrain drivetrain = new Four_Motor_Minibot_Meccanum_Drivetrain();
         //SideServo sideservo = new SideServo();
-        Led_Lights led_lights = new Led_Lights();
+
 
         // The "init" methods below are pointing back to the sybsystems
         // The drivetrain subsystem lets you pick between teleop or auto.
