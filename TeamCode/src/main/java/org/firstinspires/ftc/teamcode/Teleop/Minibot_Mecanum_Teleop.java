@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Autonomous.BasicMiniBotMeccanum;
 import org.firstinspires.ftc.teamcode.Subsystems.Four_Motor_Minibot_Meccanum_Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.SideServo;
+import org.firstinspires.ftc.teamcode.Test.Led_Lights;
 
 @TeleOp(name="Mecanum MiniBot Teleop", group="Teleop")
 
@@ -19,6 +20,7 @@ public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
         // Plus all drivetrain details can e reused for all opmodes and never recreated.
         //Four_Motor_Minibot_Meccanum_Drivetrain drivetrain = new Four_Motor_Minibot_Meccanum_Drivetrain();
         //SideServo sideservo = new SideServo();
+        Led_Lights led_lights = new Led_Lights();
 
         // The "init" methods below are pointing back to the sybsystems
         // The drivetrain subsystem lets you pick between teleop or auto.
@@ -32,6 +34,7 @@ public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
         // appear to have opposite rotation. If wheels turn the wrong way go to "Four_Motor_MiniBot_Mecannum_Drivetrain" in the
         // subsystems package and flip the directions.
 
+        led_lights.init(hardwareMap);
         sideServo.init(hardwareMap); // keep track of capital S and lower case s on this one. It is confusing
         sideServo.moveServoCenter(); // puts servo in the center to simulate starting a match
 
@@ -84,6 +87,22 @@ public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
             if (gamepad1.b) {
                 sideServo.moveServoRight();
                 sleep(500);
+            }
+
+            if (gamepad1.dpad_up) {
+                led_lights.setPattern(led_lights.pattern1);
+            }
+
+            if (gamepad1.dpad_down) {
+                led_lights.setPattern(led_lights.pattern2);
+            }
+
+            if (gamepad1.dpad_left) {
+                led_lights.setPattern(led_lights.pattern3);
+            }
+
+            if (gamepad1.dpad_right) {
+                led_lights.setPattern(led_lights.pattern4);
             }
         }
     }
