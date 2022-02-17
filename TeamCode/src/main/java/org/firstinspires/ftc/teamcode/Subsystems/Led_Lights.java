@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Test;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -50,9 +50,9 @@ public class Led_Lights {
     public void init(HardwareMap hardwareMap)
     {
         blinkinLedDriver = hardwareMap.get(RevBlinkinLedDriver.class, "blinkin");
-        blinkinLedDriver.setPattern(pattern1);
+        blinkinLedDriver.setPattern(pattern4);
 
-        ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
+        //ledCycleDeadline = new Deadline(LED_PERIOD, TimeUnit.SECONDS);
         gamepadRateLimit = new Deadline(GAMEPAD_LOCKOUT, TimeUnit.MILLISECONDS);
     }
 
@@ -60,4 +60,7 @@ public class Led_Lights {
     {
         setPattern(pattern);
     }
+
+
+
 }
