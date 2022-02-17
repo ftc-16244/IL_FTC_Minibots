@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Autonomous.BasicMiniBotMeccanum;
 import org.firstinspires.ftc.teamcode.Subsystems.Four_Motor_Minibot_Meccanum_Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.SideServo;
-import org.firstinspires.ftc.teamcode.Test.Led_Lights;
+import org.firstinspires.ftc.teamcode.Subsystems.Led_Lights;
 
 @TeleOp(name="Mecanum MiniBot Teleop", group="Teleop")
 
