@@ -17,7 +17,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Subsystems.Four_Motor_Minibot_Meccanum_Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.SideServo;
-import org.firstinspires.ftc.teamcode.Subsystems.Led_Lights;
 
 @Autonomous(name="Basic Mecanum Drive ", group="Auto")
 @Disabled
@@ -36,7 +35,7 @@ public class BasicMiniBotMeccanum extends LinearOpMode {
     // the two are not the same. "sideServo" is the object we create and use.
 
     public SideServo sideServo = new SideServo();
-    public Led_Lights led_lights = new Led_Lights();
+
 
     // Timers and time limits for each timer
     public ElapsedTime          PIDtimer    = new ElapsedTime(); // PID loop timer
