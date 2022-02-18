@@ -1,21 +1,34 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import org.firstinspires.ftc.teamcode.Autonomous.BasicMiniBotMeccanum;
+import org.firstinspires.ftc.teamcode.Subsystems.LedSubSystem;
+
+@TeleOp(name="Mecanum MiniBot Teleop with LED", group="Teleop")
+
+public class Minibot_Mecanum_Teleop_w_LED extends BasicMiniBotMeccanum {
+
+    LedSubSystem leds = new LedSubSystem(); // instantiate an istance of LED Lights here
 
 
-@TeleOp(name="Mecanum MiniBot Teleop", group="Teleop")
-
-public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
-    //Led_Lights led_lights = new Led_Lights();
     @Override
     public void runOpMode() {
-
+       RevBlinkinLedDriver.BlinkinPattern pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_PARTY_PALETTE;
+       // Call subsystem init methods
         drivetrain.init(hardwareMap, true);
+        leds.init(hardwareMap);
         sideServo.init(hardwareMap); // keep track of capital S and lower case s on this one. It is confusing
 
+        // Set everthing to its start position as required
         sideServo.moveServoCenter(); // puts servo in the center to simulate starting a match
 
+        // Add telemetry
+        telemetry.addData("Pattern: ", leds.pattern.toString()); // initial pattern is subsystem init method.
+        telemetry.update();
+
+        //////////////////////////////////////////WAIT FOR START////////////////////////////////////
 
         waitForStart();
         if (isStopRequested()) return;
@@ -50,10 +63,7 @@ public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
             drivetrain.rightFront.setPower(rf);
             drivetrain.rightRear.setPower(rr);
 
-            telemetry.addData("Left Stick Y-Fwd", "%5.2f", y);
-            telemetry.addData("Right  Stick X-Turn", "%5.2f", x);
-            telemetry.addData("Left Stick RX-Rotation", "%5.2f", rx);
-            telemetry.update();
+
 
             // Implement Functions on Gamepad #1
 
@@ -66,25 +76,34 @@ public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
                 sideServo.moveServoRight();
                 sleep(500);
             }
-/*
+
             if (gamepad1.dpad_up) {
-                led_lights.setPattern(led_lights.pattern1);
-            }
-
-            if (gamepad1.dpad_down) {
-                led_lights.setPattern(led_lights.pattern2);
-            }
-
-            if (gamepad1.dpad_left) {
-                led_lights.setPattern(led_lights.pattern3);
-            }
-
-            if (gamepad1.dpad_right) {
-                led_lights.setPattern(led_lights.pattern4);
-            }
-*/
+                leds.displayPattern(leds.pattern1);
+                pattern = leds.pattern1;
 
 
+            } else if (gamepad1.dpad_left) {
+                leds.displayPattern(leds.pattern2);
+                pattern = leds.pattern2;
+
+
+
+            } else if (gamepad1.dpad_down) {
+                leds.displayPattern(leds.pattern3);
+                pattern = leds.pattern3;
+
+
+            } else if (gamepad1.dpad_right) {
+                leds.displayPattern(leds.pattern4);
+                pattern = leds.pattern4;
+
+
+        }
+            telemetry.addData("Pattern: ",  pattern.toString());
+            telemetry.addData("Left Stick Y-Fwd", "%5.2f", y);
+            telemetry.addData("Right  Stick X-Turn", "%5.2f", x);
+            telemetry.addData("Left Stick RX-Rotation", "%5.2f", rx);
+            telemetry.update();
         }
     }
 
