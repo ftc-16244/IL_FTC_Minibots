@@ -3,6 +3,12 @@ package org.firstinspires.ftc.teamcode.Test;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.LedSubSystem;
+/* This opmode will work with either the 12V or 5V LED strips. Some of the patterns listed in
+the Blinkin Users Manual obviously look better with the 5V strips. The solid colors are a good
+option for the 12V single color. Configuring the Blinkin as a SERVO will work but the colors
+are not predictable. SImple change the names of Colors 1 - 4 in the LED subsystem as needed.d
+More buttons can also be added if more than 4 colres are desired.
+ */
 
 @TeleOp(name="Linear LED", group="Teleop")
 
@@ -17,9 +23,6 @@ public class Linear_LED extends LinearOpMode{
         leds.init(hardwareMap);
         telemetry.addData("Pattern: ", leds.pattern.toString());
         telemetry.update();
-
-
-
 
         waitForStart();
 
