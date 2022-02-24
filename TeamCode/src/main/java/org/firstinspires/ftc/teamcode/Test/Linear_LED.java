@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Test;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystems.LedSubSystem;
@@ -11,7 +12,7 @@ More buttons can also be added if more than 4 colres are desired.
  */
 
 @TeleOp(name="Linear LED", group="Teleop")
-
+@Disabled
 public class Linear_LED extends LinearOpMode{
 
     LedSubSystem leds = new LedSubSystem(); // instantiate an istance of LED Lights here

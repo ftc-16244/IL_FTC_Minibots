@@ -13,7 +13,7 @@ import static org.firstinspires.ftc.teamcode.Subsystems.Four_Motor_Minibot_Mecca
 
 @Autonomous(name="4 Motor Encoder Test", group="Auto")
 // Disable once robot is working correctly
-//@Disabled
+@Disabled
 public class MotorEncoderTest extends BasicMiniBotMeccanum {
     public Four_Motor_Minibot_Meccanum_Drivetrain drivetrain = new Four_Motor_Minibot_Meccanum_Drivetrain();
 
