@@ -15,13 +15,13 @@ public class Minibot_Mecanum_Teleop_w_LED extends BasicMiniBotMeccanum {
 
     @Override
     public void runOpMode() {
-       RevBlinkinLedDriver.BlinkinPattern pattern = RevBlinkinLedDriver.BlinkinPattern.RAINBOW_PARTY_PALETTE;
+
        // Call subsystem init methods
         drivetrain.init(hardwareMap, true);
         leds.init(hardwareMap);
         sideServo.init(hardwareMap); // keep track of capital S and lower case s on this one. It is confusing
 
-        // Set everthing to its start position as required
+        // Set everything to its start position as required
         sideServo.moveServoCenter(); // puts servo in the center to simulate starting a match
 
         // Add telemetry
@@ -79,27 +79,24 @@ public class Minibot_Mecanum_Teleop_w_LED extends BasicMiniBotMeccanum {
 
             if (gamepad1.dpad_up) {
                 leds.displayPattern(leds.pattern1);
-                pattern = leds.pattern1;
+                leds.telemetryPattern = leds.pattern1;
 
 
             } else if (gamepad1.dpad_left) {
                 leds.displayPattern(leds.pattern2);
-                pattern = leds.pattern2;
-
+                leds.telemetryPattern = leds.pattern2;
 
 
             } else if (gamepad1.dpad_down) {
                 leds.displayPattern(leds.pattern3);
-                pattern = leds.pattern3;
-
+                leds.telemetryPattern = leds.pattern3;
 
             } else if (gamepad1.dpad_right) {
                 leds.displayPattern(leds.pattern4);
-                pattern = leds.pattern4;
-
+                leds.telemetryPattern = leds.pattern4;
 
         }
-            telemetry.addData("Pattern: ",  pattern.toString());
+            telemetry.addData("Pattern: ",  leds.telemetryPattern.toString());
             telemetry.addData("Left Stick Y-Fwd", "%5.2f", y);
             telemetry.addData("Right  Stick X-Turn", "%5.2f", x);
             telemetry.addData("Left Stick RX-Rotation", "%5.2f", rx);
