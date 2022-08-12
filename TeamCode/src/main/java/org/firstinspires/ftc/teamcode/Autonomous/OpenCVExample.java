@@ -46,37 +46,30 @@ public class OpenCVExample extends OpMode {
     }
 
     class examplePipeline extends OpenCvPipeline {
-        Mat YCbCr = new Mat();
-        Mat redLow = new Mat();
+        Mat hsv = new Mat();
         Mat redHigh = new Mat();
-        Mat red = new Mat();
-
-
         Mat leftCrop;
         Mat rightCrop;
         double leftavgfin;
         double rightavgfin;
         Mat outPut = new Mat();
-        Scalar rectColor = new Scalar(255.0,0.0,0.0);
 
         public Mat processFrame(Mat input) {
-            Imgproc.cvtColor(input,YCbCr,Imgproc.COLOR_RGB2HSV);
+            Imgproc.cvtColor(input,hsv,Imgproc.COLOR_RGB2HSV);
             telemetry.addLine("pipeline running");
 
-            Scalar lowHSV2 = new Scalar(160,0,0);
-            Scalar highHSV2 = new Scalar(180,255,255);
+            //green 80,0,0 to 150,255,255
+            //yellow 30,0,0 to 90,255,255
+            Scalar lowHSV = new Scalar(80,0,0);
+            Scalar highHSV = new Scalar(150,255,255);
 
-            Core.inRange(YCbCr,lowHSV2,highHSV2,redHigh);
+            Core.inRange(hsv,lowHSV,highHSV,outPut);
 
             Rect leftRect = new Rect(1,1,319,359);
             Rect rightRect = new Rect(320,1,319,359);
 
-            input.copyTo(outPut);
-            Imgproc.rectangle(outPut,leftRect,rectColor,2);
-            Imgproc.rectangle(outPut,rightRect,rectColor,2);
-
-            leftCrop = redHigh.submat(leftRect);
-            rightCrop = redHigh.submat(rightRect);
+            leftCrop = outPut.submat(leftRect);
+            rightCrop = outPut.submat(rightRect);
 
             Scalar leftavg = Core.mean(leftCrop);
             Scalar rightavg = Core.mean(rightCrop);
@@ -87,16 +80,13 @@ public class OpenCVExample extends OpMode {
             telemetry.addLine("Left: " + Double.toString(leftavgfin));
             telemetry.addLine("Right: " + Double.toString(rightavgfin));
 
-            leftCrop.copyTo(outPut.rowRange(1, 360).colRange(1,319));
-            rightCrop.copyTo(outPut.rowRange(1,360).colRange(320, 639));
-
             if (leftavgfin > rightavgfin) {
                 telemetry.addLine("Left");
             }
             else {
                 telemetry.addLine("Right");
             }
-            return(redHigh);
+            return(outPut);
 
         }
 
