@@ -68,24 +68,6 @@ public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
                 sideServo.moveServoRight();
                 sleep(500);
             }
-/*
-            if (gamepad1.dpad_up) {
-                led_lights.setPattern(led_lights.pattern1);
-            }
-
-            if (gamepad1.dpad_down) {
-                led_lights.setPattern(led_lights.pattern2);
-            }
-
-            if (gamepad1.dpad_left) {
-                led_lights.setPattern(led_lights.pattern3);
-            }
-
-            if (gamepad1.dpad_right) {
-                led_lights.setPattern(led_lights.pattern4);
-            }
-*/
-
 
         }
     }
