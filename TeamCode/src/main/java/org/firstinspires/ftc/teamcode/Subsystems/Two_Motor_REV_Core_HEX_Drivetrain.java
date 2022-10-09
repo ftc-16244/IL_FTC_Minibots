@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -43,9 +44,9 @@ public class Two_Motor_REV_Core_HEX_Drivetrain {
             leftFront = hwMap.get(DcMotor.class, "Left_front");
             rightFront = hwMap.get(DcMotor.class, "Right_front");
 
-            // For HD Planetary Forward yields CCW rotation when shaft is facing you.
+            // The Core HEX motors sometimes get their direction backwards
             leftFront.setDirection(DcMotor.Direction.FORWARD);
-            rightFront.setDirection(DcMotor.Direction.REVERSE);
+            rightFront.setDirection(DcMotor.Direction.FORWARD);
 
             leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

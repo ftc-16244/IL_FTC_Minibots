@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Autonomous.BasicMiniBotMeccanum;
 
 
 @TeleOp(name="Mecanum MiniBot Teleop", group="Teleop")
+@Disabled
 
 public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
     //Led_Lights led_lights = new Led_Lights();
