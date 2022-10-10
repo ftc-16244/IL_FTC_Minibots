@@ -6,7 +6,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.BasicMiniBotMeccanum;
 
 
 @TeleOp(name="Mecanum MiniBot Teleop", group="Teleop")
-@Disabled
+//@Disabled
 
 public class Minibot_Mecanum_Teleop extends BasicMiniBotMeccanum {
     //Led_Lights led_lights = new Led_Lights();

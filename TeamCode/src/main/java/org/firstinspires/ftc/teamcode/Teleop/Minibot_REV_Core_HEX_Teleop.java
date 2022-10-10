@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Autonomous.BasicMiniBotTank;
 import org.firstinspires.ftc.teamcode.Subsystems.Two_Motor_REV_Core_HEX_Drivetrain;
 
 @TeleOp(name="Tank Drive REV Core Hex", group="Teleop")
-//@Disabled
+@Disabled
 
 public class Minibot_REV_Core_HEX_Teleop extends BasicMiniBotREVCoreHex {
 
