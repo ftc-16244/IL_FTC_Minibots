@@ -52,8 +52,14 @@ public class  Four_Motor_Minibot_Meccanum_Drivetrain {
             //leftRear.setDirection(DcMotor.Direction.REVERSE);
 
             // For Mecanum #4
-            leftFront.setDirection(DcMotor.Direction.REVERSE);
-            rightFront.setDirection(DcMotor.Direction.FORWARD);
+           // leftFront.setDirection(DcMotor.Direction.REVERSE);
+            //rightFront.setDirection(DcMotor.Direction.FORWARD);
+            //rightRear.setDirection(DcMotor.Direction.REVERSE);
+            //leftRear.setDirection(DcMotor.Direction.FORWARD);
+
+            // For Mecanum #3
+            leftFront.setDirection(DcMotor.Direction.FORWARD);
+            rightFront.setDirection(DcMotor.Direction.REVERSE);
             rightRear.setDirection(DcMotor.Direction.REVERSE);
             leftRear.setDirection(DcMotor.Direction.FORWARD);
 
