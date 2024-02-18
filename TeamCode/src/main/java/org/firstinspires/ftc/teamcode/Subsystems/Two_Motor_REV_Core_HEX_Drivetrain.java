@@ -45,8 +45,8 @@ public class Two_Motor_REV_Core_HEX_Drivetrain {
             rightFront = hwMap.get(DcMotor.class, "Right_front");
 
             // The Core HEX motors sometimes get their direction backwards
-            leftFront.setDirection(DcMotor.Direction.FORWARD);
-            rightFront.setDirection(DcMotor.Direction.FORWARD);
+            leftFront.setDirection(DcMotor.Direction.REVERSE);
+            rightFront.setDirection(DcMotor.Direction.REVERSE);
 
             leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
